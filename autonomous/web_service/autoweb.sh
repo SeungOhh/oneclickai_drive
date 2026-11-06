@@ -8,15 +8,17 @@ cd /home/pi/Desktop/web_service || {
     exit 1
 }
 
-echo "인터넷 연결 확인 중..."
-
-# 인터넷 연결될 때까지 대기
-until ping -c 1 -W 2 1.1.1.1 > /dev/null 2>&1; do
-    echo "아직 인터넷 연결 안 됨... 3초 후 재시도"
-    sleep 3
+# Flask는 0.0.0.0으로 열리므로 인터넷 없이도 실행됨
+# 핫스팟 IP를 받을 때까지만 최대 30초 대기 (못 받아도 그냥 실행)
+echo "네트워크(IP) 확인 중..."
+for i in $(seq 1 15); do
+    if hostname -I | grep -q "192.168.137."; then
+        echo "IP 확인됨: $(hostname -I)"
+        break
+    fi
+    echo "아직 IP 없음... 2초 후 재시도 ($i/15)"
+    sleep 2
 done
-
-echo "인터넷 연결 확인됨!"
 
 echo "5초간 대기 중..."
 sleep 5
